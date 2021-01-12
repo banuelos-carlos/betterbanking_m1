@@ -26,15 +26,15 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
-	testImplementation 'io.rest-assured:spring-mock-mvc:4.3.3'
+	testCompile 'io.rest-assured:rest-assured'
 }
 
 test {
 	useJUnitPlatform()
 }
 
+/*
 spotless {
-  java {
-    googleJavaFormat()
-  }
-}
+	java {
+	}
+}*/

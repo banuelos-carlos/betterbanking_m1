@@ -1,37 +1,43 @@
 package com.io.magmabot.betterbanking.components;
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItems;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.web.context.WebApplicationContext;
 
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.module.mockmvc.RestAssuredMockMvc;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public final class TransactionComponentTest {
-
-	@Autowired
-	private WebApplicationContext webApplicationContext;
-
+	@LocalServerPort
+	private int port;
+	
 	@BeforeEach
 	public void initialiseRestAssuredMockMvcWebApplicationContext() {
-		RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
+		RestAssured.port = this.port;
 	}
 
 	@Test
 	public void listTransactions_shouldReturnNonEmptyJSONTransactionList() {
-		given().when().get("/transactions").then().assertThat().statusCode(200).and()
-				.contentType(ContentType.JSON).and().body("$[0].accountNumber", equalTo("123"))
-				.and().body("$[1].accountNumber", equalTo("456")).and()
-				.body("$[2].accountNumber", equalTo("789"));
+		given().when()
+				.get("/transactions")
+				.then()
+				.log()
+				.all()
+				.assertThat()
+				.statusCode(200)
+				.contentType(ContentType.JSON)
+				.body("$",
+						hasItems(hasEntry("accountNumber", "123"),
+								hasEntry("accountNumber", "456"),
+								hasEntry("accountNumber", "789")
 
+						));
 	}
 }
